@@ -43,14 +43,16 @@ public class input_manager : MonoBehaviour {
 			if (!is_paused && (Input.GetKey (KeyCode.RightArrow))) {
 				move_x++;
 			}
+
 			if (Input.GetKey (KeyCode.LeftControl)) {
 				GameObject.Find ("ghost").GetComponent<move_player> ().set_move_type (move_player.move_type.creep);
 			} else if (Input.GetKey (KeyCode.LeftShift) || Input.GetKey(KeyCode.Space)) {
-				Debug.Log ("Dashing");
+				Debug.Log ("Send Dashing");
 				GameObject.Find ("ghost").GetComponent<move_player> ().set_move_type (move_player.move_type.dash);
 			} else {
 				GameObject.Find ("ghost").GetComponent<move_player> ().set_move_type (move_player.move_type.normal);
 			}
+
 			if (move_x != 0 && move_y == 0) {
 				GameObject.Find ("ghost").GetComponent<move_player> ().move (2 + (int)move_x);
 			} else if (move_x == 0 && move_y != 0) {
@@ -58,7 +60,7 @@ public class input_manager : MonoBehaviour {
 			} else if (move_x != 0 && move_y != 0) {
 				GameObject.Find ("ghost").GetComponent<move_player> ().move (1 + (int)move_y, 1.414214f);
 				GameObject.Find ("ghost").GetComponent<move_player> ().move (2 + (int)move_x, 1.414214f);
-			} else {
+			} else if (GameObject.Find ("ghost").GetComponent<move_player> ().get_move_type() != move_player.move_type.dash){
 				GameObject.Find ("ghost").GetComponent<move_player> ().set_move_type (move_player.move_type.still);
 			}
 

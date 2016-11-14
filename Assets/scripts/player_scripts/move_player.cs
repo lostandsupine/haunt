@@ -13,7 +13,7 @@ public class move_player : MonoBehaviour {
 		normal,
 		dash
 	}
-	private move_type moving;
+	public move_type moving;
 	private Dictionary<move_type,float> move_type_velocity_dict = new Dictionary<move_type,float>(){
 		{move_type.still, 0f},
 		{move_type.creep, 1f},
@@ -21,18 +21,43 @@ public class move_player : MonoBehaviour {
 		{move_type.dash, 6f}
 	};
 	private Dictionary<move_type,float> move_type_visibility_dict = new Dictionary<move_type,float>(){
-		{move_type.still, 0f},
-		{move_type.creep, 0.01f},
-		{move_type.normal, 0.05f},
+		{move_type.still, 0.01f},
+		{move_type.creep, 0.02f},
+		{move_type.normal, 0.1f},
 		{move_type.dash, 1f}
 	};
 
 	private float velocity;
-	private float visibility;
+	public float visibility;
 	private float min_visibilty;
+	private float dash_stamina = 2f;
+	private float dash_time;
+	public bool recovering = false;
+	private float recover_visibility = 0.2f;
 
 	public void set_move_type(move_type move_type_in){
-		moving = move_type_in;
+		
+		if (moving != move_type.dash & move_type_in == move_type.dash & !recovering) {
+			// if NOT dashing, and NOT recovering, start dashing
+			dash_time = Time.time;
+			moving = move_type.dash;
+		} else if (moving == move_type.dash & !recovering) {
+			// if dashing currently, and not recovering, continue dashing
+			moving = move_type.dash;
+		} else if (recovering & move_type_in == move_type.dash) {
+			moving = move_type.normal;
+		} else {
+			// otherwise do whatever the inputed movement type is
+			moving = move_type_in;
+		}
+	}
+
+	public bool get_recovering(){
+		return (recovering);
+	}
+
+	public move_type get_move_type(){
+		return moving;
 	}
 
 	void OnCollisionEnter2D(Collision2D coll){
@@ -72,6 +97,15 @@ public class move_player : MonoBehaviour {
 	}
 
 	void Update () {
+
+		if (moving == move_type.dash & Time.time - dash_time >= dash_stamina) {
+			recovering = true;
+			Debug.Log ("start recovering");
+		}
+		if (recovering & visibility <= recover_visibility) {
+			recovering = false;
+			Debug.Log ("end recovering");
+		}
 
 		fade_visibility ();
 
