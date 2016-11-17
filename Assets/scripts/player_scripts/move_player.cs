@@ -21,9 +21,9 @@ public class move_player : MonoBehaviour {
 		{move_type.dash, 6f}
 	};
 	private Dictionary<move_type,float> move_type_visibility_dict = new Dictionary<move_type,float>(){
-		{move_type.still, 0.01f},
-		{move_type.creep, 0.02f},
-		{move_type.normal, 0.1f},
+		{move_type.still, 0.05f},
+		{move_type.creep, 0.1f},
+		{move_type.normal, 0.2f},
 		{move_type.dash, 1f}
 	};
 
@@ -34,6 +34,11 @@ public class move_player : MonoBehaviour {
 	private float dash_time;
 	public bool recovering = false;
 	private float recover_visibility = 0.2f;
+	private float room_visibility_shift = 0.0f;
+
+	public void set_room_visibility_shift(float shift_in){
+		room_visibility_shift = shift_in;
+	}
 
 	public void set_move_type(move_type move_type_in){
 		
@@ -59,16 +64,10 @@ public class move_player : MonoBehaviour {
 	public move_type get_move_type(){
 		return moving;
 	}
-
-	void OnCollisionEnter2D(Collision2D coll){
-		/*if (coll.gameObject.tag == "enemy"){
-			GameObject.Find ("game_over_text").GetComponent<game_over_script> ().game_over ();
-		}*/
-	}
-
+		
 	void fade_visibility(){
 		move_type_visibility_dict.TryGetValue (moving, out min_visibilty);
-		visibility = Mathf.Max (min_visibilty, visibility - Time.fixedDeltaTime * 0.2f);
+		visibility = Mathf.Max (0f, Mathf.Max (min_visibilty, visibility - Time.fixedDeltaTime * 0.2f) - room_visibility_shift);
 		gameObject.GetComponent<SpriteRenderer> ().material.color = new Color (1f, 1f, 1f, visibility);
 	}
 
